@@ -1,0 +1,1 @@
+select min(sal) from emp where sal in (select distinct top n sal from emp order by sal desc) 
