@@ -1,0 +1,268 @@
+//teja
+		
+		
+		if(isSweepPaymentPresent){
+			sessionData.setAgencysweepDownpay(isSweepPaymentPresent);
+			setAgencySweepValuesInSession(sessionData,billingList,quoteVO );
+		}
+		//teja
+		
+		 //teja
+	private void setAgencySweepValuesInSession(SessionData sessionData,
+			List<QuoteBillingVO> billingList, QuoteVO quoteVO) {
+		// TODO Auto-generated method stub
+		
+	final RetrieveAgencyInfoRequestDTO retrieveAgencyRq = new RetrieveAgencyInfoRequestDTO();
+	retrieveAgencyRq.setContractNumber(quoteVO.getProducerCode());
+	//retrieveAgencyRq.setTransactionEffectiveDt(quoteVO.getPolicyEffectiveDate);
+	final DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+    final Date date = new Date();
+	retrieveAgencyRq.setTransactionEffectiveDt(dateFormat.format(date));
+	
+	List<AgencySweepAddRequestDTO> agencySweepAddRqList = new ArrayList<AgencySweepAddRequestDTO>();
+	for(QuoteBillingVO billVO:billingList){
+		
+		AgencySweepAddRequestDTO agencySweepAddRq = new AgencySweepAddRequestDTO();
+		
+		//agencySweepAddRequestDTO.setPostMarkDt("2002-02-11");
+		agencySweepAddRq.setAmt(String.valueOf(billVO.getDownPaymentAmount()));
+		agencySweepAddRq.setPolicyNumber(quoteVO.getPolicyNumber());
+		//agencySweepAddRequestDTO.setNameInfoDTO(retrieveAgencyInfoResponseDTO.getNameInfoDTO());
+		//agencySweepAddRequestDTO.setOtherIdentifierDTO(retrieveAgencyInfoResponseDTO.getOtherIdentifierDTO());
+		//agencySweepAddRequestDTO.setBillingAccountNumber(retrieveAgencyInfoResponseDTO.getBankId());
+		//agencySweepAddRequestDTO.setAccountNumberId(retrieveAgencyInfoResponseDTO.getAccountNumberId());
+		//agencySweepAddRequestDTO.setAcctTypeCd(retrieveAgencyInfoResponseDTO.getAcctTypeCd());
+		//agencySweepAddRequestDTO.setContractNumber(retrieveAgencyInfoResponseDTO.getContractNumber());
+		//agencySweepAddRequestDTO.setBillingAccountNumber("1223715");
+		agencySweepAddRqList.add(agencySweepAddRq);
+	}
+	
+	sessionData.setAgencySweepAddRqList(agencySweepAddRqList);
+	sessionData.setRetrieveAgencyRq(retrieveAgencyRq);
+	
+		
+	}
+	
+	//teja
+	
+	
+	//teja
+				if(pmtVO.isAutoeCheck()||pmtVO.isHomeeCheck()){
+					List<BankAccountAddRequestDTO> bankAccountAddRqList = new ArrayList<BankAccountAddRequestDTO>();
+					SessionData data  = util.getSessionData(req);
+					Map<String,String> accTypeMap = new HashMap<String,String>();
+					/*
+					001 - Personal Savings
+					002 - Personal Checking
+					003 - Personal Money Market//not in rpw
+					004 - Business Savings
+					005 - Business Checking
+					*/
+					accTypeMap.put("PS", "001");
+					accTypeMap.put("PC", "002");
+					accTypeMap.put("BS", "004");
+					accTypeMap.put("BC", "005");
+					
+					if(pmtVO.isAutoeCheck()){
+						BankAccountAddRequestDTO bankAccountAddRq = new BankAccountAddRequestDTO();
+						List<String> accountNumberId = new ArrayList<String>();
+						accountNumberId.add(pmtVO.getAutoEcheckVO().getECheckAccountNum());
+						accountNumberId.add(pmtVO.getAutoEcheckVO().getECheckAccountNum());
+						bankAccountAddRq.setOtherId("WZH5L91457Q95WEBSRVC"); //TODO  billnotify bill acc id
+						List<String> accountId = new ArrayList<String>();
+						accountId.add("ACCOUNT_ID");
+						bankAccountAddRq.setOtherIdTypeCd(accountId);
+						bankAccountAddRq.setBillingAccountNumber("1223715");//TODO  billnotify bill acc number
+						bankAccountAddRq.setAmt(pmtVO.getAutoEcheckVO().getPaymentAmount().toString());
+						bankAccountAddRq.setReceiptTypeCd(pmtVO.getAutoEcheckVO().getHowEcheckPresented().equalsIgnoreCase("I")?"PR":"TR"); //TODO eCheck 	PR TEL eCheck	TR
+						bankAccountAddRq.setBankId(pmtVO.getAutoEcheckVO().getECheckRoutingNum());
+						bankAccountAddRq.setAccountNumberId(accountNumberId);
+						bankAccountAddRq.setAcctTypeCd(accTypeMap.get(pmtVO.getAutoEcheckVO().getCheckAccountType()));
+						bankAccountAddRq.setPolicyNumber(data.getReferenceNumber());
+						bankAccountAddRq.setTransactionRequestDt(MakeAPaymentUtil.getCurrentSystemDate());
+						bankAccountAddRqList.add(bankAccountAddRq);
+						
+					}
+					
+					if(pmtVO.isHomeeCheck()){
+						BankAccountAddRequestDTO bankAccountAddRq = new BankAccountAddRequestDTO();
+						List<String> accountNumberId = new ArrayList<String>();
+						accountNumberId.add(pmtVO.getHomeEcheckVO().getECheckAccountNum());
+						accountNumberId.add(pmtVO.getHomeEcheckVO().getECheckAccountNum());
+						bankAccountAddRq.setOtherId("WZH5L91457Q95WEBSRVC"); //TODO  billnotify bill acc id
+						List<String> accountId = new ArrayList<String>();
+						accountId.add("ACCOUNT_ID");
+						bankAccountAddRq.setOtherIdTypeCd(accountId);
+						bankAccountAddRq.setBillingAccountNumber("1223715");//TODO  billnotify bill acc number
+						bankAccountAddRq.setAmt(pmtVO.getHomeEcheckVO().getPaymentAmount().toString());
+						bankAccountAddRq.setReceiptTypeCd(pmtVO.getHomeEcheckVO().getHowEcheckPresented().equalsIgnoreCase("I")?"PR":"TR"); //TODO eCheck 	PR TEL eCheck	TR
+						bankAccountAddRq.setBankId(pmtVO.getHomeEcheckVO().getECheckRoutingNum());
+						bankAccountAddRq.setAccountNumberId(accountNumberId);
+						bankAccountAddRq.setAcctTypeCd(accTypeMap.get(pmtVO.getHomeEcheckVO().getCheckAccountType()));
+						bankAccountAddRq.setPolicyNumber(data.getReferenceNumber());
+						bankAccountAddRq.setTransactionRequestDt(MakeAPaymentUtil.getCurrentSystemDate());
+						bankAccountAddRqList.add(bankAccountAddRq);
+						
+					}
+					
+					data.setBankAccountList(bankAccountAddRqList);
+					data.seteFTDownpay(true);
+					
+					
+					
+				}
+				
+				//teja
+				
+				if(data.isAgencysweepDownpay()){
+			//set contract no to 0013066 for test
+			RetrieveAgencyInfoResponseDTO retrieveAgencyInfoRs= iExceedBilling.processRetrieveAgencySweepInfo(data.getRetrieveAgencyRq());
+			List <AgencySweepAddResponseDTO> agencySweepAddRsList = new ArrayList<AgencySweepAddResponseDTO>();
+			if(retrieveAgencyInfoRs!=null){
+			ArrayList<AgencySweepAddRequestDTO> agencySweepAddRqList = (ArrayList<AgencySweepAddRequestDTO>)data.getAgencySweepAddRqList();
+			for(AgencySweepAddRequestDTO agencySweepAddRq:agencySweepAddRqList){
+				
+				agencySweepAddRq.setNameInfoDTO(retrieveAgencyInfoRs.getNameInfoDTO());
+				agencySweepAddRq.setOtherIdentifierDTO(retrieveAgencyInfoRs.getOtherIdentifierDTO());
+				agencySweepAddRq.setBillingAccountNumber(retrieveAgencyInfoRs.getBankId());
+				agencySweepAddRq.setAccountNumberId(retrieveAgencyInfoRs.getAccountNumberId());
+				agencySweepAddRq.setAcctTypeCd(retrieveAgencyInfoRs.getAcctTypeCd());
+				agencySweepAddRq.setContractNumber(retrieveAgencyInfoRs.getContractNumber());
+				agencySweepAddRq.setBillingAccountNumber("1223715");
+				agencySweepAddRq.setBillAccountStatusCd("A");
+				AgencySweepAddResponseDTO agencySweepAddRs = iExceedBilling.processAgencySweepAdd(agencySweepAddRq);
+				agencySweepAddRsList.add(agencySweepAddRs);
+			}
+			}
+			else {
+				 log.warning("Exceed Agency Retrieve Failed");
+			}
+			
+			//iterate agencySweepAddRsList for status/failure of add if msgstatus empty = success else display error
+		}
+		if(data.iseFTDownpay()){
+			
+			
+			
+			
+			
+			
+		}
+		//teja
+		
+		
+		public AgencySweepAddResponseDTO processAgencySweepAdd(
+			 AgencySweepAddRequestDTO agencySweepAddRq)
+			throws ApplicationException{
+		ExceedBillingHelper exceedBillingHelper = new ExceedBillingHelper();
+		return exceedBillingHelper.processAgencySweepAdd(agencySweepAddRq);
+		
+	}
+	
+	public RetrieveAgencyInfoResponseDTO processRetrieveAgencySweepInfo(
+			 RetrieveAgencyInfoRequestDTO retrieveAgencyInfoRq)
+			throws ApplicationException{
+		ExceedBillingHelper exceedBillingHelper = new ExceedBillingHelper();
+		return exceedBillingHelper.processRetrieveAgencySweepInfo(retrieveAgencyInfoRq);
+		
+	}
+	
+	
+	
+	@Override
+	public AgencySweepAddResponseDTO processAgencySweepAdd(
+			AgencySweepAddRequestDTO agencySweepAddRq)
+			throws ApplicationException {
+		return exceedBillingLocal.processAgencySweepAdd(agencySweepAddRq);
+	}
+
+	@Override
+	public RetrieveAgencyInfoResponseDTO processRetrieveAgencySweepInfo(
+			RetrieveAgencyInfoRequestDTO retrieveAgencyInfoRq)
+			throws ApplicationException {
+		return exceedBillingLocal.processRetrieveAgencySweepInfo(retrieveAgencyInfoRq);
+	}
+	
+	
+	
+	public AgencySweepAddResponseDTO processAgencySweepAdd(
+			AgencySweepAddRequestDTO agencySweepAddRq) {
+		AgencySweepAddResponseDTO agencySweepAddRs=null;
+		AgencySweepSoapClient client;
+		AgencySweepClientConfig clientConfig=new AgencySweepClientConfig();
+		//clientConfig.setEndpointURL("http://usgobtejwas820a.kemperi.com:9080/commfw/services2/AgencySweep");
+		clientConfig.setEndpointURL("http://exceedjcommdev1.unitrininc.com:9080/commfw/services2/AgencySweep");
+		clientConfig.setUserId("QTP");
+		clientConfig.setPassword("QUALITY");
+		clientConfig.setFromId("MyOrigin");
+		clientConfig.setClientOrg("CSC");
+		clientConfig.setClientName("UX");
+		agencySweepAddRq.setRqUID("319DA5F3-A73C-45DE-B54C537BF852653E");
+		agencySweepAddRq.setCurCd("USD");
+		agencySweepAddRq.setReceiptTypeCd("PW");
+		agencySweepAddRq.setManualSuspenseInd("N");
+		try 
+		{
+			client=new AgencySweepSoapClientImpl(clientConfig);
+			agencySweepAddRs=client.agencySweepAdd(agencySweepAddRq);
+		}
+		catch (AgencySweepSoapException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return agencySweepAddRs;
+	}
+
+	public RetrieveAgencyInfoResponseDTO processRetrieveAgencySweepInfo(
+			RetrieveAgencyInfoRequestDTO retrieveAgencyInfoRq) {
+		AgencySweepSoapClient client;
+		AgencySweepClientConfig clientConfig=new AgencySweepClientConfig();
+		//clientConfig.setEndpointURL("http://usgobtejwas820a.kemperi.com:9080/commfw/services2/AgencySweep");
+		clientConfig.setEndpointURL("http://exceedjcommdev1.unitrininc.com:9080/commfw/services2/AgencySweep");
+		clientConfig.setUserId("QTP");
+		clientConfig.setPassword("QUALITY");
+		clientConfig.setFromId("MyOrigin");
+		clientConfig.setClientOrg("CSC");
+		clientConfig.setClientName("UX");
+		
+		retrieveAgencyInfoRq.setRqUID("319DA5F3-A73C-45DE-B54C537BF852653E");
+		retrieveAgencyInfoRq.setCurCd("USD");
+		RetrieveAgencyInfoResponseDTO retrieveAgencyInfoRs =null;
+		try 
+		{
+			client=new AgencySweepSoapClientImpl(clientConfig);
+			retrieveAgencyInfoRs=client.retrieveAgencyInfo(retrieveAgencyInfoRq);
+		}
+		catch (AgencySweepSoapException e)
+		{
+			e.printStackTrace();
+		}
+		return retrieveAgencyInfoRs;
+	}
+	
+	
+		public AgencySweepAddResponseDTO processAgencySweepAdd(
+			 AgencySweepAddRequestDTO agencySweepAddRq)
+			throws ApplicationException;
+	
+	public RetrieveAgencyInfoResponseDTO processRetrieveAgencySweepInfo(
+			 RetrieveAgencyInfoRequestDTO retrieveAgencyInfoRq)
+			throws ApplicationException;
+	
+	public BankAccountAddResponseDTO processBankAccountAdd(
+			BankAccountAddRequestDTO bankAccountAddRequestDTO)
+			throws ApplicationException;
+			
+			
+			public AgencySweepAddResponseDTO processAgencySweepAdd(
+			 AgencySweepAddRequestDTO agencySweepAddRq)
+			throws ApplicationException;
+	
+	public RetrieveAgencyInfoResponseDTO processRetrieveAgencySweepInfo(
+			 RetrieveAgencyInfoRequestDTO retrieveAgencyInfoRq)
+			throws ApplicationException;
+	
+	public BankAccountAddResponseDTO processBankAccountAdd(
+			BankAccountAddRequestDTO bankAccountAddRequestDTO)
+			throws ApplicationException;
