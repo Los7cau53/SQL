@@ -7,6 +7,7 @@
 <title>Teja -CSV to Bulk BO orders -KITE</title>
 	<h1>CSV to Bulk BO orders -KITE</h1>
 <a href="example.csv">Sample CSV to Use</a>	
+	<button type="button" class="btn btn-success" onclick="placeBasketOrder()">Place All Orders</button>
 </head>
 
 <body>
@@ -89,7 +90,7 @@
       reader.onerror = function(){ alert('Unable to read ' + file.fileName); };
     }
   </script>
-		<button type="button" class="btn btn-success" onclick="placeBasketOrder()">Place All Orders</button>
+		
 	<script src="https://kite.trade/publisher.js?v=1"></script>
 	<script>
 		var kite = null;
