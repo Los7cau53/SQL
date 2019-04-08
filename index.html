@@ -148,6 +148,8 @@
 				var variety = x[row][1];
 				var tradingSymbol = x[row][2];
 				var transaction = x[row][3];
+				var productType = x[row][4]; //product type
+				if("INTRADAY" == productType) productType= "MIS";
 				//ignore product type hard coded as MIS
 				var orderType = x[row][5];
 				var quantity =parseInt( x[row][6]);
@@ -165,7 +167,7 @@
 							"transaction_type": transaction,
 							"order_type": orderType,
 							"quantity": quantity,
-              "product": "MIS",
+              "product": productType,
 							"price": limitPrice,
 							"trigger_price": triggerPrice,
 							"stoploss":stoploss,
